@@ -2,6 +2,7 @@ package com.rahimovjavlon1212.musicplayer.fragments;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.rahimovjavlon1212.musicplayer.adapters.LibraryAdapter;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,11 +48,11 @@ public class AllFragment extends Fragment {
         mAdapter.onItemClicked = new LibraryAdapter.OnItemClicked() {
             @Override
             public void onClick(String path) {
-                MediaPlayer player = MediaPlayer.create(getActivity(), Uri.parse(path));
+                MediaPlayer player = MediaPlayer.create(getContext(), Uri.parse(path));
                 if (player != null) {
                     player.start();
                 } else {
-                    Toast.makeText(getContext(), path, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "The file can't be played !!!", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -75,6 +77,9 @@ public class AllFragment extends Fragment {
                 String musicPath = musicCursor.getString(musicPathColumn);
                 mList.add(new MusicData(musicTitle, musicArtist, musicPath, R.drawable.image));
             } while (musicCursor.moveToNext());
+        }
+        if (musicCursor != null) {
+            musicCursor.close();
         }
     }
 }
