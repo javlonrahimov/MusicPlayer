@@ -8,18 +8,26 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import com.rahimovjavlon1212.musicplayer.fragments.AllFragment;
 import com.rahimovjavlon1212.musicplayer.fragments.FavouriteFragment;
 import com.rahimovjavlon1212.musicplayer.fragments.PlaylistsFragment;
+import com.rahimovjavlon1212.musicplayer.models.MusicData;
+
+import java.util.List;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
-    public MyPagerAdapter(FragmentManager fm) {
+    private List<MusicData> mList;
+
+    public MyPagerAdapter(FragmentManager fm, List<MusicData> list) {
         super(fm);
+        this.mList = list;
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0:
-                return new AllFragment();
+            case 0: {
+                AllFragment allFragment = new AllFragment(mList);
+                return allFragment;
+            }
             case 1:
                 return new FavouriteFragment();
             default:
@@ -36,7 +44,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "All";
+                return "Tracks";
             case 1:
                 return "Favourite";
             case 2:

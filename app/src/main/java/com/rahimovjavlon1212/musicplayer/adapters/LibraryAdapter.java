@@ -36,18 +36,25 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MusicViewHolder holder, final int position) {
-            holder.musicTitle.setText(mData.get(position).getTitle());
-            holder.musicArtist.setText(mData.get(position).getArtist());
-            holder.musicImage.setImageResource(mData.get(position).getImagePath());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onItemClicked != null) {
-                        onItemClicked.onClick(mData.get(position).getMusicPath());
-                    }
+    public void onBindViewHolder(@NonNull final MusicViewHolder holder, final int position) {
+        holder.musicTitle.setText(mData.get(position).getTitle());
+        holder.musicArtist.setText(mData.get(position).getArtist());
+        holder.musicImage.setImageResource(mData.get(position).getImagePath());
+        if (mData.get(position).isFocused()) {
+            holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.holo_blue_light));
+            holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
+        } else {
+            holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
+            holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.black));
+        }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onItemClicked != null) {
+                    onItemClicked.onClick(mData.get(position), position);
                 }
-            });
+            }
+        });
     }
 
     @Override
@@ -55,8 +62,21 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         return mData.size();
     }
 
-    public interface OnItemClicked{
-        void onClick(String path);
+    public interface OnItemClicked {
+        void onClick(MusicData musicData, int position);
+    }
+
+    public void setFocus(int position) {
+        for (int i = 0; i < mData.size(); i++) {
+            if (i == position) {
+                mData.get(i).setFocused(true);
+                notifyItemChanged(i);
+            }
+            if (i != position && mData.get(i).isFocused()) {
+                mData.get(i).setFocused(false);
+                notifyItemChanged(i);
+            }
+        }
     }
 }
 
