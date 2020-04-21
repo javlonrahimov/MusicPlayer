@@ -79,12 +79,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/holo_blue_light"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageNowPlaying"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_margin="8dp"
             android:src="@drawable/image"
+            app:civ_border_color="@android:color/holo_blue_light"
+            app:civ_border_width="1dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -95,27 +103,34 @@
             android:orientation="vertical"
             android:paddingStart="@dimen/margin8"
             android:paddingEnd="@dimen/margin8"
-            app:layout_constraintEnd_toStartOf="@id/linearLayout"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/linearLayout"
             app:layout_constraintStart_toEndOf="@id/imageNowPlaying"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:ellipsize="marquee"
                 android:id="@+id/titleNowPlaying"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="I would"
-                android:textColor="@android:color/black"
-                android:textSize="14sp" />
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="14sp"
+                tools:text="I would" />
 
             <TextView
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:ellipsize="marquee"
                 android:id="@+id/artistNowPlaying"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="Connie Talbot"
-                android:textSize="12sp" />
+                android:textColor="@android:color/holo_blue_light"
+                android:textSize="12sp"
+                tools:text="Connie Talbot" />
         </LinearLayout>
 
         <LinearLayout
@@ -128,6 +143,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
+                android:layout_gravity="center"
                 android:id="@+id/prevCurrent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -136,6 +152,7 @@
                 android:src="@drawable/ic_skip_previous_black_24dp" />
 
             <ImageButton
+                android:layout_gravity="center"
                 android:id="@+id/pausePlayCurrent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -144,6 +161,7 @@
                 android:src="@drawable/ic_pause_black_24dp" />
 
             <ImageButton
+                android:layout_gravity="center"
                 android:id="@+id/nextCurrent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

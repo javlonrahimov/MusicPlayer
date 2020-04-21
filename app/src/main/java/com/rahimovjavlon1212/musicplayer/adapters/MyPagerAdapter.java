@@ -5,10 +5,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
 import com.rahimovjavlon1212.musicplayer.fragments.AllFragment;
 import com.rahimovjavlon1212.musicplayer.fragments.FavouriteFragment;
 import com.rahimovjavlon1212.musicplayer.fragments.PlaylistsFragment;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
+import com.rahimovjavlon1212.musicplayer.models.PlaylistData;
 
 import java.util.List;
 
@@ -25,11 +27,11 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0: {
-                AllFragment allFragment = new AllFragment(mList);
-                return allFragment;
+                return new AllFragment(mList);
             }
-            case 1:
-                return new FavouriteFragment();
+            case 1: {
+                return new FavouriteFragment(mList);
+            }
             default:
                 return new PlaylistsFragment();
         }

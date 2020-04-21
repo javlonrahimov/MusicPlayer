@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -22,9 +21,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.rahimovjavlon1212.musicplayer.adapters.MyPagerAdapter;
-import com.rahimovjavlon1212.musicplayer.cache.CurrentMusicCache;
+import com.rahimovjavlon1212.musicplayer.cache.PlayerCache;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
-import com.rahimovjavlon1212.musicplayer.singeltons.MyPlayer;
+import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,6 +47,7 @@ public class LibraryActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
         nowPlayingImage = findViewById(R.id.imageNowPlaying);
         nowPlayingTitle = findViewById(R.id.titleNowPlaying);
         nowPlayingArtist = findViewById(R.id.artistNowPlaying);
@@ -58,8 +58,8 @@ public class LibraryActivity extends AppCompatActivity {
         MyPlayer.getPlayer().onChangeListenerLibraryActivity = new MyPlayer.OnChangeListenerLibraryActivity() {
             @Override
             public void onChange() {
-                int index = MyPlayer.getPlayer().getCurrentIndex();
-                setCurrentMusic(mList.get(index));
+                String id = MyPlayer.getPlayer().getCurrentId();
+                setCurrentMusic(getMusicDataById(id));
             }
         };
 
@@ -82,7 +82,7 @@ public class LibraryActivity extends AppCompatActivity {
 
     public void doStuff() {
         mList = MyPlayer.getPlayer().getPlaylist();
-        loadListeners(CurrentMusicCache.getCurrentMusicCache().getCurrentMusic());
+        loadListeners(PlayerCache.getPlayerCache().getCurrentMusic());
         ViewPager viewPager = findViewById(R.id.viewPagerLibraryActivity);
         MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mList);
         viewPager.setAdapter(myPagerAdapter);
@@ -149,6 +149,7 @@ public class LibraryActivity extends AppCompatActivity {
                 if (ContextCompat.checkSelfPermission(LibraryActivity.this,
                         Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                    MyPlayer.getPlayer().setPlaylist(this);
                     doStuff();
                 }
             } else {
@@ -161,7 +162,9 @@ public class LibraryActivity extends AppCompatActivity {
     private void setCurrentMusic(MusicData musicData) {
         nowPlayingImage.setImageResource(musicData.getImagePath());
         nowPlayingArtist.setText(musicData.getArtist());
+        nowPlayingArtist.setSelected(true);
         nowPlayingTitle.setText(musicData.getTitle());
+        nowPlayingTitle.setSelected(true);
         if (MyPlayer.getPlayer().isPlaying()) {
             pausePlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
         } else {
@@ -176,7 +179,11 @@ public class LibraryActivity extends AppCompatActivity {
     }
 
     private void loadListeners(MusicData musicData) {
+        if (musicData.getMusicId().equals("null")){
+            musicData = MyPlayer.getPlayer().getPlaylist().get(0);
+        }
         setCurrentMusic(musicData);
+        final MusicData finalMusicData = musicData;
         pausePlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,7 +191,7 @@ public class LibraryActivity extends AppCompatActivity {
                     MyPlayer.getPlayer().pause();
                     pausePlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                 } else {
-                    MyPlayer.getPlayer().start();
+                    MyPlayer.getPlayer().start(finalMusicData);
                     pausePlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
                 }
             }
@@ -193,7 +200,7 @@ public class LibraryActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyPlayer.getPlayer().nextMusic();
+                MyPlayer.getPlayer().nextMusic(true);
             }
         });
 
@@ -210,5 +217,13 @@ public class LibraryActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), NowPlayingActivity.class));
             }
         });
+    }
+    private MusicData getMusicDataById(String id){
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).getMusicId().equals(id)){
+                return mList.get(i);
+            }
+        }
+        return mList.get(0);
     }
 }

@@ -12,23 +12,48 @@ import static com.rahimovjavlon1212.musicplayer.utils.Utils.CURRENT_MUSIC_IS_FOC
 import static com.rahimovjavlon1212.musicplayer.utils.Utils.CURRENT_MUSIC_KEY;
 import static com.rahimovjavlon1212.musicplayer.utils.Utils.CURRENT_MUSIC_PATH;
 import static com.rahimovjavlon1212.musicplayer.utils.Utils.CURRENT_MUSIC_TITLE;
+import static com.rahimovjavlon1212.musicplayer.utils.Utils.IS_LOOP_MODE;
+import static com.rahimovjavlon1212.musicplayer.utils.Utils.IS_SHUFFLE_MODE;
+import static com.rahimovjavlon1212.musicplayer.utils.Utils.PLAYER_PREFERENCES_KEY;
 
-public class CurrentMusicCache {
-    private static CurrentMusicCache currentMusicCache;
+public class PlayerCache {
+    private static PlayerCache playerCache;
     private static SharedPreferences currentMusicPreferences;
+    private static SharedPreferences playerPreferences;
 
-    private CurrentMusicCache(Context context) {
+    private PlayerCache(Context context) {
         currentMusicPreferences = context.getSharedPreferences(CURRENT_MUSIC_KEY, Context.MODE_PRIVATE);
+        playerPreferences = context.getSharedPreferences(PLAYER_PREFERENCES_KEY, Context.MODE_PRIVATE);
     }
 
     public static void init(Context context) {
-        if (currentMusicCache == null) {
-            currentMusicCache = new CurrentMusicCache(context);
+        if (playerCache == null) {
+            playerCache = new PlayerCache(context);
         }
     }
 
-    public static CurrentMusicCache getCurrentMusicCache() {
-        return currentMusicCache;
+    public static PlayerCache getPlayerCache() {
+        return playerCache;
+    }
+
+    public void writeShuffleMode(boolean isShuffleMode){
+        SharedPreferences.Editor editor = playerPreferences.edit();
+        editor.putBoolean(IS_SHUFFLE_MODE, isShuffleMode);
+        editor.apply();
+    }
+
+    public void writeLoopMode(boolean isLoopMode){
+        SharedPreferences.Editor editor = playerPreferences.edit();
+        editor.putBoolean(IS_LOOP_MODE, isLoopMode);
+        editor.apply();
+    }
+
+    public boolean getShuffleMode(){
+       return playerPreferences.getBoolean(IS_SHUFFLE_MODE,false);
+    }
+
+    public boolean getLoopMode(){
+        return playerPreferences.getBoolean(IS_LOOP_MODE,false);
     }
 
     public void writeCurrentMusic(MusicData musicData) {
@@ -42,7 +67,7 @@ public class CurrentMusicCache {
     }
 
     public MusicData getCurrentMusic() {
-        String musicId = currentMusicPreferences.getString(CURRENT_MUSIC_ID, "");
+        String musicId = currentMusicPreferences.getString(CURRENT_MUSIC_ID, "null");
         String musicTitle = currentMusicPreferences.getString(CURRENT_MUSIC_TITLE, "");
         String musicArtist = currentMusicPreferences.getString(CURRENT_MUSIC_ARTIST, "");
         String musicPath = currentMusicPreferences.getString(CURRENT_MUSIC_PATH, "");

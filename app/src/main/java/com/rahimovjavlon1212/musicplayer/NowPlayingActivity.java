@@ -1,14 +1,243 @@
 package com.rahimovjavlon1212.musicplayer;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.rahimovjavlon1212.musicplayer.cache.PlayerCache;
+import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
+import com.rahimovjavlon1212.musicplayer.models.MusicData;
+import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
-public class NowPlayingActivity extends AppCompatActivity {
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class NowPlayingActivity extends AppCompatActivity implements View.OnClickListener {
+    private ImageButton dropButton;
+    private ImageButton soundButton;
+    private ImageButton infoButton;
+    private ImageButton playlistButton;
+    private ImageButton favButton;
+    private ImageButton addButton;
+    private ImageButton shuffleButton;
+    private ImageButton prevButton;
+    private ImageButton playPauseButton;
+    private ImageButton nextButton;
+    private ImageButton loopButton;
+    private CircleImageView musicImage;
+    private TextView musicTitle;
+    private TextView musicArtist;
+    private TextView currentTime;
+    private TextView duration;
+    private SeekBar seekBar;
+
+    MusicData musicData;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
+        loadViews();
+        loadDataToViews();
+        loadListeners();
     }
+
+    private void loadDataToViews() {
+        musicData = PlayerCache.getPlayerCache().getCurrentMusic();
+
+        musicImage.setImageResource(musicData.getImagePath());
+        musicTitle.setText(musicData.getTitle());
+        musicArtist.setText(musicData.getArtist());
+        int durationCount = MyPlayer.getPlayer().getDuration();
+        duration.setText(createTimeLabel(durationCount));
+        seekBar.setMax(durationCount);
+        if (MyPlayer.getPlayer().isPlaying()) {
+            playPauseButton.setImageResource(R.drawable.ic_pause_black_big);
+        } else {
+            playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_big);
+        }
+        if (PlayerCache.getPlayerCache().getShuffleMode()) {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_black_active);
+        } else {
+            shuffleButton.setImageResource(R.drawable.ic_shuffle_black_24dp);
+        }
+        if (PlayerCache.getPlayerCache().getLoopMode()) {
+            loopButton.setImageResource(R.drawable.ic_loop_black_active);
+        } else {
+            loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
+        }
+        if (PlayerDatabase.getPlayerDatabase().isFav(musicData)){
+            favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+        }else {
+            favButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+        }
+    }
+
+    private void loadListeners() {
+        dropButton.setOnClickListener(this);
+        playlistButton.setOnClickListener(this);
+        playPauseButton.setOnClickListener(this);
+        prevButton.setOnClickListener(this);
+        nextButton.setOnClickListener(this);
+        soundButton.setOnClickListener(this);
+        infoButton.setOnClickListener(this);
+        favButton.setOnClickListener(this);
+        addButton.setOnClickListener(this);
+        shuffleButton.setOnClickListener(this);
+        loopButton.setOnClickListener(this);
+
+        MyPlayer.getPlayer().onChangeListenerNowPlaying = new MyPlayer.OnChangeListenerNowPlaying() {
+            @Override
+            public void onChange() {
+                loadDataToViews();
+            }
+        };
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    MyPlayer.getPlayer().seekTo(progress);
+                    seekBar.setProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (MyPlayer.getPlayer() != null) {
+                    try {
+                        Message msg = new Message();
+                        msg.what = MyPlayer.getPlayer().getCurrentPosition();
+                        handler.sendMessage(msg);
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            }
+        }).start();
+    }
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            int currentPosition = msg.what;
+            seekBar.setProgress(currentPosition);
+            currentTime.setText(createTimeLabel(currentPosition));
+        }
+    };
+
+    private String createTimeLabel(int time) {
+        String timeLabel;
+        String min = String.valueOf(time / 1000 / 60);
+        String sec = String.valueOf(time / 1000 % 60);
+
+        if (sec.length() < 2) sec = "0" + sec;
+        if (min.length() < 2) min = "0" + min;
+        timeLabel = min + " : " + sec;
+        return timeLabel;
+    }
+
+    private void loadViews() {
+        dropButton = findViewById(R.id.dropButtonNowPlayingActivity);
+        soundButton = findViewById(R.id.soundButtonNowPlayingActivity);
+        infoButton = findViewById(R.id.infoButtonNowPlayingActivity);
+        playlistButton = findViewById(R.id.playlistButtonNowPlayingButton);
+        favButton = findViewById(R.id.favButtonNowPlayingActivity);
+        addButton = findViewById(R.id.addButtonNowPlayingActivity);
+        shuffleButton = findViewById(R.id.shuffleButtonNowPlayingActivity);
+        prevButton = findViewById(R.id.prevButtonNowPlayingActivity);
+        playPauseButton = findViewById(R.id.playPauseButtonNowPlayingActivity);
+        nextButton = findViewById(R.id.nextButtonNowPlayingActivity);
+        loopButton = findViewById(R.id.loopButtonNowPlayingActivity);
+
+        currentTime = findViewById(R.id.currentTimeNowPlayingActivity);
+        duration = findViewById(R.id.musicDurationNowPlayingActivity);
+        seekBar = findViewById(R.id.seekBarNowPlayingActivity);
+
+        musicImage = findViewById(R.id.musicImageNowPlayingActivity);
+        musicArtist = findViewById(R.id.musicArtistNowPlayingActivity);
+        musicTitle = findViewById(R.id.musicTitleNowPlayingActivity);
+
+        musicTitle.setSelected(true);
+        musicArtist.setSelected(true);
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == dropButton || v == playlistButton) {
+            finish();
+        } else if (v == playPauseButton) {
+            if (MyPlayer.getPlayer().isPlaying()) {
+                MyPlayer.getPlayer().pause();
+                playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_big);
+            } else {
+                MyPlayer.getPlayer().start();
+                playPauseButton.setImageResource(R.drawable.ic_pause_black_big);
+            }
+        } else if (v == prevButton) {
+            MyPlayer.getPlayer().prevMusic();
+        } else if (v == nextButton) {
+            MyPlayer.getPlayer().nextMusic(true);
+        } else if (v == soundButton) {
+            Toast.makeText(this, "Sound Pressed", Toast.LENGTH_SHORT).show();
+        } else if (v == infoButton) {
+            Toast.makeText(this, "Info Pressed", Toast.LENGTH_SHORT).show();
+        } else if (v == favButton) {
+                if (!PlayerDatabase.getPlayerDatabase().isFav(musicData)){
+                    PlayerDatabase.getPlayerDatabase().addFav(musicData);
+                    favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+                }else {
+                    PlayerDatabase.getPlayerDatabase().minusFav(musicData);
+                    favButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                }
+        } else if (v == addButton) {
+            Toast.makeText(this, "Add Pressed", Toast.LENGTH_SHORT).show();
+        } else if (v == shuffleButton) {
+            if (!PlayerCache.getPlayerCache().getShuffleMode()){
+                PlayerCache.getPlayerCache().writeShuffleMode(true);
+                shuffleButton.setImageResource(R.drawable.ic_shuffle_black_active);
+            }else{
+                PlayerCache.getPlayerCache().writeShuffleMode(false);
+                shuffleButton.setImageResource(R.drawable.ic_shuffle_black_24dp);
+            }
+        } else if (v == loopButton) {
+            if (!PlayerCache.getPlayerCache().getLoopMode()){
+                PlayerCache.getPlayerCache().writeLoopMode(true);
+                loopButton.setImageResource(R.drawable.ic_loop_black_active);
+            }else{
+                PlayerCache.getPlayerCache().writeLoopMode(false);
+                loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
+            }
+        }
+    }
+
 }

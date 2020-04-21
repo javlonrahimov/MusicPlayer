@@ -28,6 +28,11 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.context = context;
     }
 
+    public void setData(List<MusicData> mData){
+        this.mData = mData;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,9 +46,12 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         holder.musicArtist.setText(mData.get(position).getArtist());
         holder.musicImage.setImageResource(mData.get(position).getImagePath());
         if (mData.get(position).isFocused()) {
+            holder.musicImage.setBorderWidth(5);
+            holder.musicImage.setBorderColor(context.getResources().getColor(android.R.color.holo_blue_dark));
             holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.holo_blue_light));
             holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
         } else {
+            holder.musicImage.setBorderWidth(0);
             holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
             holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.black));
         }
@@ -66,13 +74,13 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         void onClick(MusicData musicData, int position);
     }
 
-    public void setFocus(int position) {
+    public void setFocus(String id) {
         for (int i = 0; i < mData.size(); i++) {
-            if (i == position) {
+            if (mData.get(i).getMusicId().equals(id)) {
                 mData.get(i).setFocused(true);
                 notifyItemChanged(i);
             }
-            if (i != position && mData.get(i).isFocused()) {
+            if (!mData.get(i).getMusicId().equals(id) && mData.get(i).isFocused()) {
                 mData.get(i).setFocused(false);
                 notifyItemChanged(i);
             }

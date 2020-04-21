@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
+            android:id="@+id/dropButtonNowPlayingActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
@@ -31,6 +32,7 @@
             android:layout_gravity="end">
 
             <ImageButton
+                android:id="@+id/soundButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -39,6 +41,7 @@
                 android:src="@drawable/ic_volume_up_black_24dp" />
 
             <ImageButton
+                android:id="@+id/infoButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -49,6 +52,7 @@
     </FrameLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/musicImageNowPlayingActivity"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:elevation="@dimen/padding4"
@@ -71,16 +75,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:layout_marginStart="@dimen/margin8"
+            android:layout_marginEnd="@dimen/margin8"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"
+            android:id="@+id/musicTitleNowPlayingActivity"
             android:textColor="@android:color/black"
             android:textAlignment="center"
-            android:text="I would"
+            tools:text="I would"
             android:textSize="28sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
+            android:layout_marginStart="@dimen/margin8"
+            android:layout_marginEnd="@dimen/margin8"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"
+            android:id="@+id/musicArtistNowPlayingActivity"
             android:textSize="18sp"
             android:textAlignment="center"
-            android:text="Conni Talbot"
+            tools:text="Connie Talbot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -102,6 +120,7 @@
             android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/playlistButtonNowPlayingButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
@@ -111,6 +130,7 @@
                 android:src="@drawable/ic_queue_music_black_24dp" />
 
             <ImageButton
+                android:id="@+id/favButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -120,6 +140,7 @@
                 android:src="@drawable/ic_favorite_border_black_24dp" />
 
             <ImageButton
+                android:id="@+id/addButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -130,28 +151,37 @@
         </FrameLayout>
 
         <SeekBar
+            android:id="@+id/seekBarNowPlayingActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin8" />
+            android:layout_marginTop="@dimen/margin8"
+            android:layout_marginStart="@dimen/margin8"
+            android:layout_marginEnd="@dimen/margin8" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginBottom="@dimen/margin8">
 
             <TextView
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:id="@+id/currentTimeNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:text="01:17" />
+                tools:text="01:17" />
 
             <TextView
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:id="@+id/musicDurationNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:text="03:21" />
+                tools:text="03:21" />
         </FrameLayout>
 
         <LinearLayout
@@ -164,6 +194,8 @@
             android:weightSum="5">
 
             <ImageButton
+                android:layout_gravity="center"
+                android:id="@+id/shuffleButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -173,6 +205,7 @@
                 android:src="@drawable/ic_shuffle_black_24dp" />
 
             <ImageButton
+                android:id="@+id/prevButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -182,6 +215,7 @@
                 android:src="@drawable/ic_skip_previous_black_big" />
 
             <ImageButton
+                android:id="@+id/playPauseButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -191,6 +225,7 @@
                 android:src="@drawable/ic_play_arrow_black_big" />
 
             <ImageButton
+                android:id="@+id/nextButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
@@ -200,6 +235,8 @@
                 android:src="@drawable/ic_skip_next_black_big" />
 
             <ImageButton
+                android:layout_gravity="center"
+                android:id="@+id/loopButtonNowPlayingActivity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin8"
