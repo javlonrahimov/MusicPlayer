@@ -1,6 +1,48 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">Name</string>
+    <string name="artist">Artist</string>
+    <string name="track_length">Track length</string>
+    <string name="format">Format</string>
+    <string name="size">Size</string>
+    <string name="path">Path</string>
+    <string name="back_button">back button</string>
+    <string name="tracks">\ttracks</string>
+    <string name="mb">\tMB</string>
+    <string name="added_to">Added to </string>
+    <string name="already_have_song">There is already that song in this playlist</string>
+    <string name="already_have_playlist">There is playlist with this name</string>
+    <string name="already_have_playlist_retry">There is a playlist with this name. Enter another name</string>
+    <string name="edit">edit</string>
+    <string name="playlist_created">Playlist created</string>
+    <string name="cannot_play">Can\'t play this audio</string>
+    <string name="selected">\tselected</string>
+    <string name="select_tracks">Select tracks</string>
+    <string name="music">MUSIC</string>
+    <string name="player">Player</string>
+    <string name="search_icon">search icon</string>
+    <string name="prev_icon">prev icon</string>
+    <string name="play_icon">play icon</string>
+    <string name="next_icon">next icon</string>
+    <string name="drop_icon">drop icon</string>
+    <string name="info_icon">info icon</string>
+    <string name="playlist_icon">playlist icon</string>
+    <string name="fav_icon">fav_icon</string>
+    <string name="add_icon">add icon</string>
+    <string name="shuffle_icon">shuffle icon</string>
+    <string name="loop_icon">loop icon</string>
+    <string name="unchecked_icon">unchecked icon</string>
+    <string name="all">All</string>
+    <string name="done">Done</string>
+    <string name="playlist_name">Playlist name</string>
+    <string name="enter_playlist_name">enter playlist name…</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">create</string>
+    <string name="more_menu">more menu</string>
+    <string name="create_new_playlist">Create new playlist</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="tracksTitle">Tracks</string>
+    <string name="favourites">Favourites</string>
+    <string name="playlists">Playlists</string>
 </resources>

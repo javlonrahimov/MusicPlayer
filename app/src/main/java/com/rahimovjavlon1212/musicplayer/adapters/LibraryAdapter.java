@@ -28,7 +28,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
         this.context = context;
     }
 
-    public void setData(List<MusicData> mData){
+    public void setData(List<MusicData> mData) {
         this.mData = mData;
         notifyDataSetChanged();
     }
@@ -44,7 +44,10 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     public void onBindViewHolder(@NonNull final MusicViewHolder holder, final int position) {
         holder.musicTitle.setText(mData.get(position).getTitle());
         holder.musicArtist.setText(mData.get(position).getArtist());
-        holder.musicImage.setImageResource(mData.get(position).getImagePath());
+        if (mData.get(position).getBitmap() != null)
+            holder.musicImage.setImageBitmap(mData.get(position).getBitmap());
+        else
+            holder.musicImage.setImageResource(R.drawable.image);
         if (mData.get(position).isFocused()) {
             holder.musicImage.setBorderWidth(5);
             holder.musicImage.setBorderColor(context.getResources().getColor(android.R.color.holo_blue_dark));
@@ -55,12 +58,9 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
             holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
             holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.black));
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClicked != null) {
-                    onItemClicked.onClick(mData.get(position), position);
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClicked != null) {
+                onItemClicked.onClick(mData.get(position));
             }
         });
     }
@@ -71,20 +71,19 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
     }
 
     public interface OnItemClicked {
-        void onClick(MusicData musicData, int position);
+        void onClick(MusicData musicData);
     }
 
     public void setFocus(String id) {
         for (int i = 0; i < mData.size(); i++) {
             if (mData.get(i).getMusicId().equals(id)) {
                 mData.get(i).setFocused(true);
-                notifyItemChanged(i);
             }
             if (!mData.get(i).getMusicId().equals(id) && mData.get(i).isFocused()) {
                 mData.get(i).setFocused(false);
-                notifyItemChanged(i);
             }
         }
+        notifyDataSetChanged();
     }
 }
 

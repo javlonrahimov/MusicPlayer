@@ -1,8 +1,6 @@
 package com.rahimovjavlon1212.musicplayer;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -12,26 +10,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.rahimovjavlon1212.musicplayer.adapters.MyPagerAdapter;
 import com.rahimovjavlon1212.musicplayer.cache.PlayerCache;
+import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
-import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.rahimovjavlon1212.musicplayer.player.MyPlayer.getPlayer;
+
 public class LibraryActivity extends AppCompatActivity {
 
-    private static final int MY_PERMISSION_REQUEST = 9;
-    private List<MusicData> mList;
     private ImageView nowPlayingImage;
     private TextView nowPlayingTitle;
     private TextView nowPlayingArtist;
@@ -54,37 +49,18 @@ public class LibraryActivity extends AppCompatActivity {
         prevButton = findViewById(R.id.prevCurrent);
         pausePlayButton = findViewById(R.id.pausePlayCurrent);
         nextButton = findViewById(R.id.nextCurrent);
+        ImageButton searchButton = findViewById(R.id.searchButtonLibraryActivity);
+        searchButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), SearchActivity.class)));
 
-        MyPlayer.getPlayer().onChangeListenerLibraryActivity = new MyPlayer.OnChangeListenerLibraryActivity() {
-            @Override
-            public void onChange() {
-                String id = MyPlayer.getPlayer().getCurrentId();
-                setCurrentMusic(getMusicDataById(id));
-            }
-        };
-
-        if (ContextCompat.checkSelfPermission(LibraryActivity.this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(LibraryActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                ActivityCompat.requestPermissions(LibraryActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSION_REQUEST);
-            } else {
-                ActivityCompat.requestPermissions(LibraryActivity.this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSION_REQUEST);
-            }
-        } else {
-            doStuff();
-        }
+        getPlayer().onChangeListenerLibraryActivity = () -> setCurrentMusic(PlayerCache.getPlayerCache().getCurrentMusic());
+        doStuff();
     }
 
     public void doStuff() {
-        mList = MyPlayer.getPlayer().getPlaylist();
+        List<MusicData> mList = getPlayer().getPlaylist();
         loadListeners(PlayerCache.getPlayerCache().getCurrentMusic());
         ViewPager viewPager = findViewById(R.id.viewPagerLibraryActivity);
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mList);
+        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getApplicationContext(), getSupportFragmentManager(), mList);
         viewPager.setAdapter(myPagerAdapter);
         final TabLayout tabLayout = findViewById(R.id.tabLayoutLibraryActivity);
         tabLayout.setupWithViewPager(viewPager);
@@ -102,7 +78,7 @@ public class LibraryActivity extends AppCompatActivity {
                 tabTextView.setTextColor(getResources().getColor(android.R.color.black));
 
                 if (i == 0) {
-                    tabTextView.setTextSize(22);
+                    tabTextView.setTextSize(20);
                 }
             }
         }
@@ -115,7 +91,7 @@ public class LibraryActivity extends AppCompatActivity {
                 for (int i = 0; i < tabChildCount; i++) {
                     View tabViewChild = vgTab.getChildAt(i);
                     if (tabViewChild instanceof TextView) {
-                        ((TextView) tabViewChild).setTextSize(22);
+                        ((TextView) tabViewChild).setTextSize(20);
                     }
                 }
             }
@@ -140,90 +116,47 @@ public class LibraryActivity extends AppCompatActivity {
         });
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(LibraryActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-                    MyPlayer.getPlayer().setPlaylist(this);
-                    doStuff();
-                }
-            } else {
-                Toast.makeText(this, "No permission granted", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
     private void setCurrentMusic(MusicData musicData) {
-        nowPlayingImage.setImageResource(musicData.getImagePath());
+        nowPlayingImage.setImageBitmap(PlayerCache.getPlayerCache().getCurrentBitmap());
         nowPlayingArtist.setText(musicData.getArtist());
         nowPlayingArtist.setSelected(true);
         nowPlayingTitle.setText(musicData.getTitle());
         nowPlayingTitle.setSelected(true);
-        if (MyPlayer.getPlayer().isPlaying()) {
+        if (getPlayer().isPlaying()) {
             pausePlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
         } else {
             try {
-                MyPlayer.getPlayer().setDataSource(musicData.getMusicPath());
-                MyPlayer.getPlayer().prepare();
+                getPlayer().reset();
+                getPlayer().setDataSource(musicData.getMusicPath());
+                getPlayer().prepare();
             } catch (IOException e) {
                 e.printStackTrace();
+                Toast.makeText(this, getResources().getString(R.string.cannot_play), Toast.LENGTH_SHORT).show();
+                return;
             }
             pausePlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
         }
     }
 
     private void loadListeners(MusicData musicData) {
-        if (musicData.getMusicId().equals("null")){
-            musicData = MyPlayer.getPlayer().getPlaylist().get(0);
+        if (musicData.getMusicId().equals("null")) {
+            musicData = getPlayer().getPlaylist().get(0);
         }
         setCurrentMusic(musicData);
-        final MusicData finalMusicData = musicData;
-        pausePlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyPlayer.getPlayer().isPlaying()) {
-                    MyPlayer.getPlayer().pause();
-                    pausePlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
-                } else {
-                    MyPlayer.getPlayer().start(finalMusicData);
-                    pausePlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
-                }
+        pausePlayButton.setOnClickListener(v -> {
+            if (getPlayer().isPlaying()) {
+                getPlayer().pause();
+                pausePlayButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+            } else {
+                getPlayer().start(null, PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()));
+                pausePlayButton.setImageResource(R.drawable.ic_pause_black_24dp);
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyPlayer.getPlayer().nextMusic(true);
-            }
-        });
+        nextButton.setOnClickListener(v -> getPlayer().nextMusic(true));
 
-        prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyPlayer.getPlayer().prevMusic();
-            }
-        });
+        prevButton.setOnClickListener(v -> getPlayer().prevMusic());
         ConstraintLayout nowPlayingMusic = findViewById(R.id.nowPlayingMusic);
-        nowPlayingMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), NowPlayingActivity.class));
-            }
-        });
-    }
-    private MusicData getMusicDataById(String id){
-        for (int i = 0; i < mList.size(); i++) {
-            if (mList.get(i).getMusicId().equals(id)){
-                return mList.get(i);
-            }
-        }
-        return mList.get(0);
+        nowPlayingMusic.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), NowPlayingActivity.class)));
     }
 }

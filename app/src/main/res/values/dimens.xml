@@ -2,4 +2,28 @@
 <resources>
     <dimen name="margin8">8dp</dimen>
     <dimen name="padding4">4dp</dimen>
+    <dimen name="elevation4">4dp</dimen>
+    <dimen name="textSize20">20sp</dimen>
+    <dimen name="textSize18">18sp</dimen>
+    <dimen name="tabIndicatorHeight">0dp</dimen>
+    <dimen name="match_constraint">0dp</dimen>
+    <dimen name="elevation6">6dp</dimen>
+    <dimen name="nowPlayingHeight70">70dp</dimen>
+    <dimen name="decorHeight">1dp</dimen>
+    <dimen name="circleRadius46">46dp</dimen>
+    <dimen name="civBorder1">1dp</dimen>
+    <dimen name="textSize14">14sp</dimen>
+    <dimen name="textSize12">12sp</dimen>
+    <dimen name="textSize28">28sp</dimen>
+    <dimen name="margin16">16dp</dimen>
+    <dimen name="margin20">20dp</dimen>
+    <dimen name="textSize22">22sp</dimen>
+    <dimen name="circleRadius180">180dp</dimen>
+    <dimen name="margin12">12dp</dimen>
+    <dimen name="padding12">12dp</dimen>
+    <dimen name="itemPlaylistHeight64">64dp</dimen>
+    <dimen name="itemMusicHeight70">70dp</dimen>
+    <dimen name="circleRadius58">58dp</dimen>
+    <dimen name="textSize16">16sp</dimen>
+    <dimen name="circleRadius52">52dp</dimen>
 </resources>

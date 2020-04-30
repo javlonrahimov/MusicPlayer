@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".fragments.PlaylistDetails">
+
+    <FrameLayout
+        android:id="@+id/toolbarFragmentDetails"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/backButtonPlaylistDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin8"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/drop_icon"
+                android:padding="@dimen/padding4"
+                android:src="@drawable/ic_chevron_left_black_24dp" />
+
+            <TextView
+                android:id="@+id/titlePlaylistDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:textColor="@color/colorAccentSecondary"
+                android:textSize="@dimen/textSize20"
+                tools:text="Guardians of the galaxy" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/addButtonPlaylistDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin8"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/add_icon"
+                android:padding="@dimen/padding4"
+                android:src="@drawable/ic_add_black_24dp" />
+
+            <ImageButton
+                android:id="@+id/moreButtonPlaylistDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin8"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/more_menu"
+                android:padding="@dimen/padding4"
+                android:src="@drawable/ic_more_vert_black_24dp" />
+        </LinearLayout>
+    </FrameLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPlaylistDetails"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/match_constraint"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarFragmentDetails"
+        tools:listitem="@layout/item_music" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

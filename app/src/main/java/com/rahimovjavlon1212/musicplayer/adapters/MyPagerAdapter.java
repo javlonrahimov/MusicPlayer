@@ -1,10 +1,13 @@
 package com.rahimovjavlon1212.musicplayer.adapters;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.rahimovjavlon1212.musicplayer.R;
 import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
 import com.rahimovjavlon1212.musicplayer.fragments.AllFragment;
 import com.rahimovjavlon1212.musicplayer.fragments.FavouriteFragment;
@@ -12,13 +15,16 @@ import com.rahimovjavlon1212.musicplayer.fragments.PlaylistsFragment;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
 import com.rahimovjavlon1212.musicplayer.models.PlaylistData;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
     private List<MusicData> mList;
+    private Context context;
 
-    public MyPagerAdapter(FragmentManager fm, List<MusicData> list) {
+    public MyPagerAdapter(Context context, FragmentManager fm, List<MusicData> list) {
         super(fm);
+        this.context = context;
         this.mList = list;
     }
 
@@ -32,8 +38,11 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
             case 1: {
                 return new FavouriteFragment(mList);
             }
-            default:
-                return new PlaylistsFragment();
+            default: {
+                List<PlaylistData> playlistDataList = PlayerDatabase.getPlayerDatabase().getAllPlaylists();
+                Collections.reverse(playlistDataList);
+                return new PlaylistsFragment(playlistDataList, mList);
+            }
         }
     }
 
@@ -46,11 +55,11 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Tracks";
+                return context.getResources().getString(R.string.tracksTitle);
             case 1:
-                return "Favourite";
+                return context.getResources().getString(R.string.favourites);
             case 2:
-                return "Playlists";
+                return context.getResources().getString(R.string.playlists);
             default:
                 return null;
         }

@@ -1,61 +1,50 @@
 package com.rahimovjavlon1212.musicplayer.models;
 
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+
 public class MusicData {
     private String musicId;
     private String title;
     private String artist;
     private String musicPath;
-    private int imagePath;
+    private Bitmap bitmap;
+    private Uri imageUri;
     private boolean isFocused;
+    private boolean isSelected;
 
-    public MusicData(String musicId, String title, String artist, String musicPath, int imagePath, boolean isFocused) {
+    public MusicData(String musicId, String title, String artist, String musicPath, Uri imageUri, boolean isFocused) {
         this.musicId = musicId;
         this.title = title;
         this.artist = artist;
         this.musicPath = musicPath;
-        this.imagePath = imagePath;
         this.isFocused = isFocused;
+        this.imageUri = imageUri;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getArtist() {
         return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public int getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(int imagePath) {
-        this.imagePath = imagePath;
     }
 
     public String getMusicPath() {
         return musicPath;
     }
 
-    public void setMusicPath(String musicPath) {
-        this.musicPath = musicPath;
-    }
-
     public String getMusicId() {
         return musicId;
-    }
-
-    public void setMusicId(String musicId) {
-        this.musicId = musicId;
     }
 
     public boolean isFocused() {
@@ -64,5 +53,17 @@ public class MusicData {
 
     public void setFocused(boolean focused) {
         isFocused = focused;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Uri getImageUri() {
+        return imageUri;
     }
 }

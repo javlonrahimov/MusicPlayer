@@ -13,6 +13,7 @@ public class Utils {
     public static final String CURRENT_MUSIC_IS_FOCUSED = "470";
     public static final String IS_SHUFFLE_MODE = "258";
     public static final String IS_LOOP_MODE = "154";
+    public static final String CURRENT_PLAYLIST_NAME = "025";
 
     // database keys
     public static final String PLAYER_DATABASE_NAME  = "player_database_name";

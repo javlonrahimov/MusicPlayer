@@ -5,18 +5,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.rahimovjavlon1212.musicplayer.cache.PlayerCache;
 import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
+import com.rahimovjavlon1212.musicplayer.fragments.BottomSheetFragment;
+import com.rahimovjavlon1212.musicplayer.fragments.FragmentInNowPlaying;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
 import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
@@ -24,7 +24,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NowPlayingActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageButton dropButton;
-    private ImageButton soundButton;
     private ImageButton infoButton;
     private ImageButton playlistButton;
     private ImageButton favButton;
@@ -44,7 +43,6 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
     MusicData musicData;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +50,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
-
+        MyPlayer.getPlayer().onChangeListenerNowPlaying = this::loadDataToViews;
         loadViews();
         loadDataToViews();
         loadListeners();
@@ -60,8 +58,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
 
     private void loadDataToViews() {
         musicData = PlayerCache.getPlayerCache().getCurrentMusic();
-
-        musicImage.setImageResource(musicData.getImagePath());
+        musicImage.setImageBitmap(PlayerCache.getPlayerCache().getCurrentBitmap());
         musicTitle.setText(musicData.getTitle());
         musicArtist.setText(musicData.getArtist());
         int durationCount = MyPlayer.getPlayer().getDuration();
@@ -82,9 +79,9 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
         } else {
             loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
         }
-        if (PlayerDatabase.getPlayerDatabase().isFav(musicData)){
+        if (PlayerDatabase.getPlayerDatabase().isFav(musicData)) {
             favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
-        }else {
+        } else {
             favButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
         }
     }
@@ -95,19 +92,11 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
         playPauseButton.setOnClickListener(this);
         prevButton.setOnClickListener(this);
         nextButton.setOnClickListener(this);
-        soundButton.setOnClickListener(this);
         infoButton.setOnClickListener(this);
         favButton.setOnClickListener(this);
         addButton.setOnClickListener(this);
         shuffleButton.setOnClickListener(this);
         loopButton.setOnClickListener(this);
-
-        MyPlayer.getPlayer().onChangeListenerNowPlaying = new MyPlayer.OnChangeListenerNowPlaying() {
-            @Override
-            public void onChange() {
-                loadDataToViews();
-            }
-        };
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -129,21 +118,19 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (MyPlayer.getPlayer() != null) {
-                    try {
-                        Message msg = new Message();
-                        msg.what = MyPlayer.getPlayer().getCurrentPosition();
-                        handler.sendMessage(msg);
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ignored) {
-                    }
+        new Thread(() -> {
+            while (MyPlayer.getPlayer() != null) {
+                try {
+                    Message msg = new Message();
+                    msg.what = MyPlayer.getPlayer().getCurrentPosition();
+                    handler.sendMessage(msg);
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
                 }
             }
         }).start();
     }
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -167,7 +154,6 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
 
     private void loadViews() {
         dropButton = findViewById(R.id.dropButtonNowPlayingActivity);
-        soundButton = findViewById(R.id.soundButtonNowPlayingActivity);
         infoButton = findViewById(R.id.infoButtonNowPlayingActivity);
         playlistButton = findViewById(R.id.playlistButtonNowPlayingButton);
         favButton = findViewById(R.id.favButtonNowPlayingActivity);
@@ -193,47 +179,48 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        if (v == dropButton || v == playlistButton) {
+        if (v == dropButton) {
             finish();
+        } else if (v == playlistButton) {
+            getSupportFragmentManager().beginTransaction().add(R.id.containerForFragmentNowPlayingActivity, new FragmentInNowPlaying(false)).addToBackStack("Playlist").commit();
         } else if (v == playPauseButton) {
             if (MyPlayer.getPlayer().isPlaying()) {
                 MyPlayer.getPlayer().pause();
                 playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_big);
             } else {
-                MyPlayer.getPlayer().start();
+                MyPlayer.getPlayer().start(null, PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()));
                 playPauseButton.setImageResource(R.drawable.ic_pause_black_big);
             }
         } else if (v == prevButton) {
             MyPlayer.getPlayer().prevMusic();
         } else if (v == nextButton) {
             MyPlayer.getPlayer().nextMusic(true);
-        } else if (v == soundButton) {
-            Toast.makeText(this, "Sound Pressed", Toast.LENGTH_SHORT).show();
         } else if (v == infoButton) {
-            Toast.makeText(this, "Info Pressed", Toast.LENGTH_SHORT).show();
+            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(duration.getText().toString());
+            bottomSheetFragment.show(getSupportFragmentManager(), "Info");
         } else if (v == favButton) {
-                if (!PlayerDatabase.getPlayerDatabase().isFav(musicData)){
-                    PlayerDatabase.getPlayerDatabase().addFav(musicData);
-                    favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
-                }else {
-                    PlayerDatabase.getPlayerDatabase().minusFav(musicData);
-                    favButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                }
+            if (!PlayerDatabase.getPlayerDatabase().isFav(musicData)) {
+                PlayerDatabase.getPlayerDatabase().addFav(musicData);
+                favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+            } else {
+                PlayerDatabase.getPlayerDatabase().minusFav(musicData);
+                favButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+            }
         } else if (v == addButton) {
-            Toast.makeText(this, "Add Pressed", Toast.LENGTH_SHORT).show();
+            getSupportFragmentManager().beginTransaction().add(R.id.containerForFragmentNowPlayingActivity, new FragmentInNowPlaying(true)).addToBackStack("Add").commit();
         } else if (v == shuffleButton) {
-            if (!PlayerCache.getPlayerCache().getShuffleMode()){
+            if (!PlayerCache.getPlayerCache().getShuffleMode()) {
                 PlayerCache.getPlayerCache().writeShuffleMode(true);
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_black_active);
-            }else{
+            } else {
                 PlayerCache.getPlayerCache().writeShuffleMode(false);
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_black_24dp);
             }
         } else if (v == loopButton) {
-            if (!PlayerCache.getPlayerCache().getLoopMode()){
+            if (!PlayerCache.getPlayerCache().getLoopMode()) {
                 PlayerCache.getPlayerCache().writeLoopMode(true);
                 loopButton.setImageResource(R.drawable.ic_loop_black_active);
-            }else{
+            } else {
                 PlayerCache.getPlayerCache().writeLoopMode(false);
                 loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
             }

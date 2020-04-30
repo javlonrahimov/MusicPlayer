@@ -1,18 +1,24 @@
 package com.rahimovjavlon1212.musicplayer.player;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import com.rahimovjavlon1212.musicplayer.R;
 import com.rahimovjavlon1212.musicplayer.cache.PlayerCache;
+import com.rahimovjavlon1212.musicplayer.databases.PlayerDatabase;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
+import com.rahimovjavlon1212.musicplayer.models.PlaylistData;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -20,13 +26,18 @@ import java.util.Random;
 public class MyPlayer extends MediaPlayer {
     private static MyPlayer myPlayer;
     private List<MusicData> playlist;
+    private List<MusicData> currentPlaylist;
     public OnChangeListenerLibraryActivity onChangeListenerLibraryActivity;
     public OnChangeListenerAllFragment onChangeListenerAllFragment;
     public OnChangeListenerNowPlaying onChangeListenerNowPlaying;
+    public OnChangeListenerFragmentDetails onChangeListenerFragmentDetails;
     public OnChangeListenerFavouritesFragment onChangeListenerFavouritesFragment;
+    public OnChangeListenerFragmentInNowPlaying onChangeListenerFragmentInNowPlaying;
+    private Context context;
+
 
     private MyPlayer(Context context) {
-       setPlaylist(context);
+        this.context = context;
     }
 
     public static MyPlayer getPlayer() {
@@ -37,104 +48,84 @@ public class MyPlayer extends MediaPlayer {
         if (myPlayer == null) {
             myPlayer = new MyPlayer(context);
         }
-        myPlayer.setOnCompletionListener(new OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                MyPlayer.myPlayer.nextMusic(false);
-            }
-        });
+        myPlayer.setOnCompletionListener(mp -> MyPlayer.myPlayer.nextMusic(false));
     }
 
-    public void start(MusicData musicData) {
+    public void start(MusicData musicData, PlaylistData playlistData) {
+        if (!playlistData.getName().isEmpty()) {
+            currentPlaylist = playlistData.getPlaylist(getPlaylist());
+            PlayerCache.getPlayerCache().setCurrentPlaylist(playlistData);
+        } else {
+            currentPlaylist = playlist;
+            PlayerCache.getPlayerCache().setCurrentPlaylist(playlistData);
+        }
+        if (musicData != null) {
+            try {
+                MyPlayer.getPlayer().reset();
+                MyPlayer.getPlayer().setDataSource(musicData.getMusicPath());
+                MyPlayer.getPlayer().prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(context, context.getResources().getString(R.string.cannot_play), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PlayerCache.getPlayerCache().writeCurrentMusic(musicData);
+        }
         myPlayer.start();
-        musicData.setFocused(true);
-        PlayerCache.getPlayerCache().writeCurrentMusic(musicData);
-        onChangeListenerLibraryActivity.onChange();
-        onChangeListenerAllFragment.onChange();
+        if (onChangeListenerLibraryActivity != null) {
+            onChangeListenerLibraryActivity.onChange();
+        }
+        if (onChangeListenerAllFragment != null) {
+            onChangeListenerAllFragment.onChange();
+        }
         if (onChangeListenerNowPlaying != null) {
             onChangeListenerNowPlaying.onChange();
         }
+        if (onChangeListenerFragmentInNowPlaying != null) {
+            onChangeListenerFragmentInNowPlaying.onChange();
+        }
         if (onChangeListenerFavouritesFragment != null) {
             onChangeListenerFavouritesFragment.onChange();
+        }
+        if (onChangeListenerFragmentDetails != null) {
+            onChangeListenerFragmentDetails.onChange();
         }
     }
 
     public void nextMusic(boolean fromUser) {
         if (fromUser || !PlayerCache.getPlayerCache().getLoopMode()) {
-            if (prevNextCurrent(1)) {
-                onChangeListenerLibraryActivity.onChange();
-                if (onChangeListenerAllFragment != null) {
-                    onChangeListenerAllFragment.onChange();
-                }
-                if (onChangeListenerNowPlaying != null) {
-                    onChangeListenerNowPlaying.onChange();
-                }
-                if (onChangeListenerFavouritesFragment != null) {
-                    onChangeListenerFavouritesFragment.onChange();
-                }
-            }
+            prevNextCurrent(1);
         } else {
-            if (prevNextCurrent(0)) {
-                onChangeListenerLibraryActivity.onChange();
-                if (onChangeListenerAllFragment != null) {
-                    onChangeListenerAllFragment.onChange();
-                }
-                if (onChangeListenerNowPlaying != null) {
-                    onChangeListenerNowPlaying.onChange();
-                }
-                if (onChangeListenerFavouritesFragment != null) {
-                    onChangeListenerFavouritesFragment.onChange();
-                }
-            }
+            prevNextCurrent(0);
         }
     }
 
     public void prevMusic() {
-        if (prevNextCurrent(-1)) {
-            onChangeListenerLibraryActivity.onChange();
-            onChangeListenerAllFragment.onChange();
-            if (onChangeListenerNowPlaying != null) {
-                onChangeListenerNowPlaying.onChange();
-            }
-            if (onChangeListenerFavouritesFragment != null) {
-                onChangeListenerFavouritesFragment.onChange();
-            }
-        }
+        prevNextCurrent(-1);
     }
 
-    private boolean prevNextCurrent(int a) {
+    private void prevNextCurrent(int a) {
         int index = getMusicIndex(a);
-        if (index >= 0 && index < playlist.size()) {
-            MyPlayer.getPlayer().reset();
-            try {
-                MyPlayer.getPlayer().setDataSource(playlist.get(index).getMusicPath());
-                MyPlayer.getPlayer().prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            MyPlayer.getPlayer().start(playlist.get(index));
-            return true;
-        } else {
-            return false;
-        }
+        MyPlayer.getPlayer().reset();
+        MyPlayer.getPlayer().start(currentPlaylist.get(index), PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()));
     }
 
     private int getMusicIndex(int a) {
         int i;
 
-        if (PlayerCache.getPlayerCache().getCurrentMusic().getMusicId().equals("null")){
+        if (PlayerCache.getPlayerCache().getCurrentMusic().getMusicId().equals("null")) {
             return 0;
         }
 
         if (PlayerCache.getPlayerCache().getShuffleMode() && a != 0) {
-            return new Random().nextInt(playlist.size());
+            return new Random().nextInt(currentPlaylist.size());
         }
-        for (i = 0; i < playlist.size(); i++) {
-            if (playlist.get(i).getMusicId().equals(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId())) {
+        for (i = 0; i < currentPlaylist.size(); i++) {
+            if (currentPlaylist.get(i).getMusicId().equals(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId())) {
                 if (i == 0 && a == -1) {
-                    return playlist.size() - 1;
+                    return currentPlaylist.size() - 1;
                 }
-                if ((i == playlist.size() - 1 && a == 1)) {
+                if ((i == currentPlaylist.size() - 1 && a == 1)) {
                     return 0;
                 }
                 return i + a;
@@ -143,24 +134,15 @@ public class MyPlayer extends MediaPlayer {
         return i - 1;
     }
 
-    public String getCurrentId() {
-        int i;
-        for (i = 0; i < playlist.size(); i++) {
-            if (playlist.get(i).getMusicId().equals(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId())) {
-                return PlayerCache.getPlayerCache().getCurrentMusic().getMusicId();
-            }
-        }
-        return i - 1+"";
-    }
-
     public List<MusicData> getPlaylist() {
         return playlist;
     }
 
-    public void setPlaylist(Context context) {
+    public boolean setPlaylist(Context context) {
         ContentResolver contentResolver = Objects.requireNonNull(context.getContentResolver());
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = contentResolver.query(musicUri, null, null, null, null);
+        String where = MediaStore.Audio.Media.IS_MUSIC + "=1";
+        Cursor musicCursor = contentResolver.query(musicUri, null, where, null, null);
 
         if (musicCursor != null && musicCursor.moveToFirst()) {
             int musicIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
@@ -173,12 +155,34 @@ public class MyPlayer extends MediaPlayer {
                 String musicTitle = musicCursor.getString(musicTitleColumn);
                 String musicArtist = musicCursor.getString(musicArtistColumn);
                 String musicPath = musicCursor.getString(musicPathColumn);
-                playlist.add(new MusicData(musicId, musicTitle, musicArtist, musicPath, R.drawable.image, false));
+                long albumId = musicCursor.getLong(musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
+                Uri songArtworkUri = Uri.parse("content://media//external//audio//albumart");
+                Uri albumArtUri = ContentUris.withAppendedId(songArtworkUri, albumId);
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), albumArtUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                MusicData musicData = new MusicData(musicId, musicTitle, musicArtist, musicPath, albumArtUri, false);
+                musicData.setBitmap(bitmap);
+                playlist.add(musicData);
             } while (musicCursor.moveToNext());
+        }
+        Collections.reverse(playlist);
+        if (PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()).getData().isEmpty()) {
+            currentPlaylist = playlist;
+        } else {
+            currentPlaylist = PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()).getPlaylist(playlist);
         }
         if (musicCursor != null) {
             musicCursor.close();
         }
+        return true;
+    }
+
+    public List<MusicData> getCurrentPlaylist() {
+        return currentPlaylist;
     }
 
     public interface OnChangeListenerLibraryActivity {
@@ -189,10 +193,20 @@ public class MyPlayer extends MediaPlayer {
         void onChange();
     }
 
+    public interface OnChangeListenerFragmentDetails {
+        void onChange();
+    }
+
     public interface OnChangeListenerNowPlaying {
         void onChange();
     }
+
     public interface OnChangeListenerFavouritesFragment {
         void onChange();
     }
+
+    public interface OnChangeListenerFragmentInNowPlaying {
+        void onChange();
+    }
+
 }

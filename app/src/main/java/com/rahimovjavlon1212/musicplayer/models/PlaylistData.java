@@ -1,7 +1,5 @@
 package com.rahimovjavlon1212.musicplayer.models;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +33,13 @@ public class PlaylistData {
         this.data = data;
     }
 
-    public void addMusicDAta(MusicData musicData) {
-        this.data += "#" + musicData.getMusicId();
+    public boolean addMusicDAta(MusicData musicData) {
+        if (this.data.contains(musicData.getMusicId())) {
+            return false;
+        } else {
+            this.data += "#" + musicData.getMusicId();
+            return true;
+        }
     }
 
     public void minusMusicData(MusicData musicData) {

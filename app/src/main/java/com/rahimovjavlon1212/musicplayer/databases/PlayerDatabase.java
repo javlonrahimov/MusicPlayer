@@ -24,6 +24,7 @@ public class PlayerDatabase extends SQLiteOpenHelper {
 
     private static PlayerDatabase playerDatabase;
     public static OnFavButtonClicked onFavButtonClicked;
+    public static OnDataChanged onDataChanged;
 
 
     private PlayerDatabase(@Nullable Context context) {
@@ -59,9 +60,12 @@ public class PlayerDatabase extends SQLiteOpenHelper {
         if (checkForUnique(playlistData)) {
             SQLiteDatabase db = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
-            contentValues.put(COL_PLAYLIST_NAME, playlistData.getName());
-            contentValues.put(COL_PLAYLIST_DATA, playlistData.getData());
+            contentValues.put(COL_PLAYLIST_NAME, playlistData.getName().trim());
+            contentValues.put(COL_PLAYLIST_DATA, playlistData.getData().trim());
             db.insert(TABLE_PLAYLISTS, null, contentValues);
+            if (onDataChanged != null) {
+                onDataChanged.onClick();
+            }
             return true;
         } else {
             return false;
@@ -72,9 +76,15 @@ public class PlayerDatabase extends SQLiteOpenHelper {
         if (checkForUnique(playlistData)) {
             SQLiteDatabase db = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
-            contentValues.put(COL_PLAYLIST_NAME, playlistData.getName());
-            contentValues.put(COL_PLAYLIST_DATA, playlistData.getData());
+            contentValues.put(COL_PLAYLIST_NAME, playlistData.getName().trim());
+            contentValues.put(COL_PLAYLIST_DATA, playlistData.getData().trim());
             db.update(TABLE_PLAYLISTS, contentValues, COL_PLAYLIST_ID + " == " + playlistData.getId(), null);
+            if (onDataChanged != null) {
+                onDataChanged.onClick();
+            }
+            if (onFavButtonClicked != null) {
+                onFavButtonClicked.onClick();
+            }
             return true;
         }else {
             return false;
@@ -84,10 +94,12 @@ public class PlayerDatabase extends SQLiteOpenHelper {
     public void deletePlaylist(PlaylistData playlistData) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_PLAYLISTS, COL_PLAYLIST_ID + " == " + playlistData.getId(), null);
+        if (onDataChanged != null) {
+            onDataChanged.onClick();
+        }
     }
 
     public List<PlaylistData> getAllPlaylists() {
-        SQLiteDatabase db = getWritableDatabase();
         List<PlaylistData> data = new ArrayList<>();
         Cursor cursor = getWritableDatabase().rawQuery("SELECT * FROM " + TABLE_PLAYLISTS, null);
         cursor.moveToFirst();
@@ -123,18 +135,12 @@ public class PlayerDatabase extends SQLiteOpenHelper {
         PlaylistData favourites = getPlaylist("Favourites");
         favourites.addMusicDAta(musicData);
         updatePlaylist(favourites);
-        if (onFavButtonClicked != null) {
-            onFavButtonClicked.onClick();
-        }
     }
 
     public void minusFav(MusicData musicData) {
         PlaylistData favourites = getPlaylist("Favourites");
         favourites.minusMusicData(musicData);
         updatePlaylist(favourites);
-        if (onFavButtonClicked != null) {
-            onFavButtonClicked.onClick();
-        }
     }
 
     private boolean checkForUnique(PlaylistData playlistData) {
@@ -145,7 +151,7 @@ public class PlayerDatabase extends SQLiteOpenHelper {
             }
         }
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getName().equals(playlistData.getName())) {
+            if (list.get(i).getName().equalsIgnoreCase(playlistData.getName().trim())) {
                 return false;
             }
         }
@@ -153,6 +159,10 @@ public class PlayerDatabase extends SQLiteOpenHelper {
     }
 
     public interface OnFavButtonClicked {
+        void onClick();
+    }
+
+    public interface OnDataChanged{
         void onClick();
     }
 }
