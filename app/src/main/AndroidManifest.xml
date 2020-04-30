@@ -14,17 +14,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".SplashScreen">
+        <activity
+            android:name=".SplashScreen"
+            android:label="@string/splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".SelectMusic" />
-        <activity android:name=".NowPlayingActivity" />
-        <activity android:name=".LibraryActivity" />
+        <activity
+            android:name=".SearchActivity"
+            android:label="@string/searchLabel" />
+        <activity
+            android:name=".SelectMusic"
+            android:label="@string/SelectLabel" />
+        <activity
+            android:name=".NowPlayingActivity"
+            android:label="@string/NowPlayingLabel" />
+        <activity
+            android:name=".LibraryActivity"
+            android:label="@string/LibraryLabel" />
     </application>
 
 </manifest>

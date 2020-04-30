@@ -45,4 +45,9 @@
     <string name="tracksTitle">Tracks</string>
     <string name="favourites">Favourites</string>
     <string name="playlists">Playlists</string>
+    <string name="searchLabel">Search</string>
+    <string name="SelectLabel">Select music</string>
+    <string name="NowPlayingLabel">Now playing</string>
+    <string name="LibraryLabel">Library</string>
+    <string name="splash">Splash screen</string>
 </resources>

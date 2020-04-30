@@ -22,7 +22,7 @@
         android:layout_width="@dimen/circleRadius58"
         android:layout_height="@dimen/circleRadius58"
         android:layout_marginStart="@dimen/margin8"
-        android:src="@drawable/icon"
+        android:src="@drawable/image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/selectIconItemMusicSelectable"
         app:layout_constraintTop_toTopOf="parent" />

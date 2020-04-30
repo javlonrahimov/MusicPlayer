@@ -46,4 +46,9 @@
     <string name="tracksTitle">Qo\'shiqlar</string>
     <string name="favourites">Sevimlilar</string>
     <string name="playlists">Playlistlar</string>
+    <string name="searchLabel">Qidiruv</string>
+    <string name="SelectLabel">Musiqa tanlash</string>
+    <string name="NowPlayingLabel">Hozirgi</string>
+    <string name="LibraryLabel">Kutibxona</string>
+    <string name="splash">Splash oynasi</string>
 </resources>

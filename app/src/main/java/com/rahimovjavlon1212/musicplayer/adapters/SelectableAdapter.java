@@ -48,7 +48,10 @@ public class SelectableAdapter extends RecyclerView.Adapter<SelectableMusicViewH
         }else {
             holder.selectIcon.setImageResource(R.drawable.ic_panorama_fish_eye_black_24dp);
         }
-        holder.musicImage.setImageBitmap(mData.get(position).getBitmap());
+        if (mData.get(position).getBitmap() != null)
+            holder.musicImage.setImageBitmap(mData.get(position).getBitmap());
+        else
+            holder.musicImage.setImageResource(R.drawable.image);
         holder.itemView.setOnClickListener(v -> {
             if (onItemClicked != null) {
                 if (!mData.get(position).isSelected()){
