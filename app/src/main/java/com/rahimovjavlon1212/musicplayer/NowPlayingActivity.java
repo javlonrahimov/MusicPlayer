@@ -1,12 +1,21 @@
 package com.rahimovjavlon1212.musicplayer;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -20,11 +29,7 @@ import com.rahimovjavlon1212.musicplayer.fragments.FragmentInNowPlaying;
 import com.rahimovjavlon1212.musicplayer.models.MusicData;
 import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class NowPlayingActivity extends AppCompatActivity implements View.OnClickListener {
-    private ImageButton dropButton;
-    private ImageButton infoButton;
     private ImageButton playlistButton;
     private ImageButton favButton;
     private ImageButton addButton;
@@ -33,7 +38,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
     private ImageButton playPauseButton;
     private ImageButton nextButton;
     private ImageButton loopButton;
-    private CircleImageView musicImage;
+    private ImageView musicImage;
     private TextView musicTitle;
     private TextView musicArtist;
     private TextView currentTime;
@@ -47,9 +52,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+
         MyPlayer.getPlayer().onChangeListenerNowPlaying = this::loadDataToViews;
         loadViews();
         loadDataToViews();
@@ -58,7 +61,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
 
     private void loadDataToViews() {
         musicData = PlayerCache.getPlayerCache().getCurrentMusic();
-        musicImage.setImageBitmap(PlayerCache.getPlayerCache().getCurrentBitmap());
+        musicImage.setImageBitmap(getRoundedCornerBitmap(PlayerCache.getPlayerCache().getCurrentBitmap()));
         musicTitle.setText(musicData.getTitle());
         musicArtist.setText(musicData.getArtist());
         int durationCount = MyPlayer.getPlayer().getDuration();
@@ -71,13 +74,17 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
         }
         if (PlayerCache.getPlayerCache().getShuffleMode()) {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_black_active);
+            shuffleButton.setBackgroundResource(R.drawable.button_background_active);
         } else {
             shuffleButton.setImageResource(R.drawable.ic_shuffle_black_24dp);
+            shuffleButton.setBackgroundResource(R.drawable.button_background);
         }
         if (PlayerCache.getPlayerCache().getLoopMode()) {
             loopButton.setImageResource(R.drawable.ic_loop_black_active);
+            loopButton.setBackgroundResource(R.drawable.button_background_active);
         } else {
             loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
+            loopButton.setBackgroundResource(R.drawable.button_background);
         }
         if (PlayerDatabase.getPlayerDatabase().isFav(musicData)) {
             favButton.setImageResource(R.drawable.ic_favorite_black_24dp);
@@ -87,12 +94,10 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void loadListeners() {
-        dropButton.setOnClickListener(this);
         playlistButton.setOnClickListener(this);
         playPauseButton.setOnClickListener(this);
         prevButton.setOnClickListener(this);
         nextButton.setOnClickListener(this);
-        infoButton.setOnClickListener(this);
         favButton.setOnClickListener(this);
         addButton.setOnClickListener(this);
         shuffleButton.setOnClickListener(this);
@@ -153,8 +158,6 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void loadViews() {
-        dropButton = findViewById(R.id.dropButtonNowPlayingActivity);
-        infoButton = findViewById(R.id.infoButtonNowPlayingActivity);
         playlistButton = findViewById(R.id.playlistButtonNowPlayingButton);
         favButton = findViewById(R.id.favButtonNowPlayingActivity);
         addButton = findViewById(R.id.addButtonNowPlayingActivity);
@@ -179,9 +182,7 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        if (v == dropButton) {
-            finish();
-        } else if (v == playlistButton) {
+        if (v == playlistButton) {
             getSupportFragmentManager().beginTransaction().add(R.id.containerForFragmentNowPlayingActivity, new FragmentInNowPlaying(false)).addToBackStack("Playlist").commit();
         } else if (v == playPauseButton) {
             if (MyPlayer.getPlayer().isPlaying()) {
@@ -195,9 +196,6 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
             MyPlayer.getPlayer().prevMusic();
         } else if (v == nextButton) {
             MyPlayer.getPlayer().nextMusic(true);
-        } else if (v == infoButton) {
-            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(duration.getText().toString());
-            bottomSheetFragment.show(getSupportFragmentManager(), "Info");
         } else if (v == favButton) {
             if (!PlayerDatabase.getPlayerDatabase().isFav(musicData)) {
                 PlayerDatabase.getPlayerDatabase().addFav(musicData);
@@ -212,19 +210,57 @@ public class NowPlayingActivity extends AppCompatActivity implements View.OnClic
             if (!PlayerCache.getPlayerCache().getShuffleMode()) {
                 PlayerCache.getPlayerCache().writeShuffleMode(true);
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_black_active);
+                shuffleButton.setBackgroundResource(R.drawable.button_background_active);
             } else {
                 PlayerCache.getPlayerCache().writeShuffleMode(false);
                 shuffleButton.setImageResource(R.drawable.ic_shuffle_black_24dp);
+                shuffleButton.setBackgroundResource(R.drawable.button_background);
             }
         } else if (v == loopButton) {
             if (!PlayerCache.getPlayerCache().getLoopMode()) {
                 PlayerCache.getPlayerCache().writeLoopMode(true);
                 loopButton.setImageResource(R.drawable.ic_loop_black_active);
+                loopButton.setBackgroundResource(R.drawable.button_background_active);
             } else {
                 PlayerCache.getPlayerCache().writeLoopMode(false);
                 loopButton.setImageResource(R.drawable.ic_loop_black_24dp);
+                loopButton.setBackgroundResource(R.drawable.button_background);
             }
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.info_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.info_menu) {
+            BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(duration.getText().toString());
+            bottomSheetFragment.show(getSupportFragmentManager(), "Info");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(
+                bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        int color = -0xbdbdbe;
+        Paint paint = new Paint();
+        Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        RectF rectF = new RectF(rect);
+        float roundPx = 52f;
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 125, 125, 125);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
+    }
 }

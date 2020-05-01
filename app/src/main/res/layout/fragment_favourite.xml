@@ -17,4 +17,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_music" />
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/hintFavFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/icon"
+        android:text="@string/currently_you_don_t_have_favourite_musics"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccentPrimary"
+        android:textSize="@dimen/textSize18"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

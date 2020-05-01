@@ -35,7 +35,13 @@ public class FavouriteFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_favourite, container, false);
         mAdapter = new LibraryAdapter(getContext(), new ArrayList<>());
         PlaylistData favourites = PlayerDatabase.getPlayerDatabase().getPlaylist("favourites");
-        mAdapter.setData(favourites.getPlaylist(mList));
+        List<MusicData> favouritesList = favourites.getPlaylist(mList);
+        if (favouritesList.size() == 0){
+            view.findViewById(R.id.hintFavFragment).setVisibility(View.VISIBLE);
+        }else {
+            view.findViewById(R.id.hintFavFragment).setVisibility(View.INVISIBLE);
+        }
+        mAdapter.setData(favouritesList);
         mAdapter.setFocus(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId());
         mAdapter.onItemClicked = musicData -> MyPlayer.getPlayer().start(musicData, PlayerDatabase.getPlayerDatabase().getPlaylist("Favourites"));
         MyPlayer.getPlayer().onChangeListenerFavouritesFragment = () -> {
@@ -46,6 +52,11 @@ public class FavouriteFragment extends Fragment {
         PlayerDatabase.onFavButtonClicked = () -> {
             PlaylistData favourites1 = PlayerDatabase.getPlayerDatabase().getPlaylist("favourites");
             mAdapter.setData(favourites1.getPlaylist(mList));
+            if (favourites1.getPlaylist(mList).size() == 0){
+                view.findViewById(R.id.hintFavFragment).setVisibility(View.VISIBLE);
+            }else {
+                view.findViewById(R.id.hintFavFragment).setVisibility(View.INVISIBLE);
+            }
         };
 
         RecyclerView mRecyclerView = view.findViewById(R.id.recyclerViewFavouriteFragment);

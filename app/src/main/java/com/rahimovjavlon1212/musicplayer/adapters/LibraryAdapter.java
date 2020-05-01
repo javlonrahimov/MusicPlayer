@@ -50,9 +50,9 @@ public class LibraryAdapter extends RecyclerView.Adapter<MusicViewHolder> {
             holder.musicImage.setImageResource(R.drawable.image);
         if (mData.get(position).isFocused()) {
             holder.musicImage.setBorderWidth(5);
-            holder.musicImage.setBorderColor(context.getResources().getColor(android.R.color.holo_blue_dark));
-            holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.holo_blue_light));
-            holder.musicTitle.setTextColor(context.getResources().getColor(android.R.color.holo_blue_dark));
+            holder.musicImage.setBorderColor(context.getResources().getColor(R.color.colorPrimary));
+            holder.musicArtist.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
+            holder.musicTitle.setTextColor(context.getResources().getColor(R.color.colorPrimary));
         } else {
             holder.musicImage.setBorderWidth(0);
             holder.musicArtist.setTextColor(context.getResources().getColor(android.R.color.darker_gray));

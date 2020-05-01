@@ -26,6 +26,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
         searchView = findViewById(R.id.searchViewSearchActivity);
         searchView.setIconifiedByDefault(true);
         searchView.setFocusable(true);
@@ -56,9 +57,6 @@ public class SearchActivity extends AppCompatActivity {
         };
         RecyclerView mRecyclerView = findViewById(R.id.recyclerViewSearchActivity);
         mRecyclerView.setAdapter(mAdapter);
-
-        findViewById(R.id.backButtonSearchActivity).setOnClickListener(v -> finish());
-
     }
 
     private List<MusicData> getResults(String searchText) {

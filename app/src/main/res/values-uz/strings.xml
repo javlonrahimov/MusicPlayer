@@ -51,4 +51,9 @@
     <string name="NowPlayingLabel">Hozirgi</string>
     <string name="LibraryLabel">Kutibxona</string>
     <string name="splash">Splash oynasi</string>
+    <string name="search">Qidiruv</string>
+    <string name="info">Malumot</string>
+    <string name="currently_you_don_t_have_musics_in_your_phone">Hozirda sizning telefoningizda musiqa yo\'q</string>
+    <string name="currently_you_don_t_have_favourite_musics">Hozirda sizning sevimli qo\'shiqlaringiz yo\'q</string>
+    <string name="cover_image">audio rasmi</string>
 </resources>

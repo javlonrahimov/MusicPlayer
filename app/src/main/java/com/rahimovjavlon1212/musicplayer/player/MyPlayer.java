@@ -169,7 +169,11 @@ public class MyPlayer extends MediaPlayer {
                 playlist.add(musicData);
             } while (musicCursor.moveToNext());
         }
-        Collections.reverse(playlist);
+        if (playlist != null) {
+            Collections.reverse(playlist);
+        }else {
+            playlist = new ArrayList<>();
+        }
         if (PlayerDatabase.getPlayerDatabase().getPlaylist(PlayerCache.getPlayerCache().getCurrentPlaylistName()).getData().isEmpty()) {
             currentPlaylist = playlist;
         } else {

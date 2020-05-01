@@ -1,8 +1,9 @@
 package com.rahimovjavlon1212.musicplayer;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.ViewPager;
@@ -39,26 +41,21 @@ public class LibraryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_library);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-
         nowPlayingImage = findViewById(R.id.imageNowPlaying);
         nowPlayingTitle = findViewById(R.id.titleNowPlaying);
         nowPlayingArtist = findViewById(R.id.artistNowPlaying);
         prevButton = findViewById(R.id.prevCurrent);
         pausePlayButton = findViewById(R.id.pausePlayCurrent);
         nextButton = findViewById(R.id.nextCurrent);
-        ImageButton searchButton = findViewById(R.id.searchButtonLibraryActivity);
-        searchButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), SearchActivity.class)));
-
         getPlayer().onChangeListenerLibraryActivity = () -> setCurrentMusic(PlayerCache.getPlayerCache().getCurrentMusic());
         doStuff();
     }
 
     public void doStuff() {
         List<MusicData> mList = getPlayer().getPlaylist();
-        loadListeners(PlayerCache.getPlayerCache().getCurrentMusic());
+        if (getPlayer().getPlaylist().size() != 0) {
+            loadListeners(PlayerCache.getPlayerCache().getCurrentMusic());
+        }
         ViewPager viewPager = findViewById(R.id.viewPagerLibraryActivity);
         MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getApplicationContext(), getSupportFragmentManager(), mList);
         viewPager.setAdapter(myPagerAdapter);
@@ -75,7 +72,7 @@ public class LibraryActivity extends AppCompatActivity {
                 tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
                 tabTextView.setText(tab.getText());
-                tabTextView.setTextColor(getResources().getColor(android.R.color.black));
+                tabTextView.setTextColor(getResources().getColor(R.color.colorAccentSecondary));
 
                 if (i == 0) {
                     tabTextView.setTextSize(20);
@@ -139,7 +136,7 @@ public class LibraryActivity extends AppCompatActivity {
     }
 
     private void loadListeners(MusicData musicData) {
-        if (musicData.getMusicId().equals("null")) {
+        if (musicData.getMusicId().equals("null") && getPlayer().getPlaylist().size() != 0) {
             musicData = getPlayer().getPlaylist().get(0);
         }
         setCurrentMusic(musicData);
@@ -158,5 +155,21 @@ public class LibraryActivity extends AppCompatActivity {
         prevButton.setOnClickListener(v -> getPlayer().prevMusic());
         ConstraintLayout nowPlayingMusic = findViewById(R.id.nowPlayingMusic);
         nowPlayingMusic.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), NowPlayingActivity.class)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.search_menu) {
+            startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

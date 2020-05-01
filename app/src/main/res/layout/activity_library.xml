@@ -6,63 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".LibraryActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarLibraryActivity"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:background="@color/colorPrimary"
-        android:elevation="@dimen/elevation4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/music"
-                    android:textSize="@dimen/textSize20"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@string/player"
-                    android:textSize="@dimen/textSize18" />
-            </LinearLayout>
-
-            <ImageButton
-                android:id="@+id/searchButtonLibraryActivity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="@dimen/margin8"
-                android:background="?selectableItemBackgroundBorderless"
-                android:contentDescription="@string/search_icon"
-                android:padding="@dimen/padding4"
-                android:src="@drawable/ic_search_black_24dp" />
-        </FrameLayout>
-    </androidx.appcompat.widget.Toolbar>
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayoutLibraryActivity"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:background="@color/colorPrimary"
-        android:elevation="@dimen/elevation4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLibraryActivity"
+        app:layout_constraintTop_toTopOf="parent"
         app:tabIndicatorHeight="@dimen/tabIndicatorHeight"
+        app:tabSelectedTextColor="@color/colorAccentSecondary"
         app:tabTextColor="@color/colorAccentSecondary" />
 
     <androidx.viewpager.widget.ViewPager
@@ -80,7 +33,7 @@
         app:layout_constraintBottom_toTopOf="@id/nowPlayingMusic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLibraryActivity" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/nowPlayingMusic"
@@ -95,7 +48,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/decorHeight"
-            android:background="@color/colorAccentPrimary"
+            android:background="@color/colorAccentSecondary"
             app:layout_constraintTop_toTopOf="parent" />
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -104,7 +57,7 @@
             android:layout_height="@dimen/circleRadius46"
             android:layout_margin="@dimen/margin8"
             android:src="@drawable/image"
-            app:civ_border_color="@color/colorAccentPrimary"
+            app:civ_border_color="@color/colorAccentSecondary"
             app:civ_border_width="@dimen/civBorder1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +82,7 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/colorAccentPrimary"
+                android:textColor="@color/colorAccentSecondary"
                 android:textSize="@dimen/textSize14"
                 tools:text="I would" />
 
@@ -141,7 +94,7 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/colorAccentPrimary"
+                android:textColor="@color/colorAccentSecondary"
                 android:textSize="@dimen/textSize12"
                 tools:text="Connie Talbot" />
         </LinearLayout>
@@ -170,8 +123,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:padding="@dimen/padding4"
                 android:layout_margin="@dimen/margin8"
-                android:background="?selectableItemBackgroundBorderless"
+                android:background="@drawable/button_background_active"
                 android:contentDescription="@string/play_icon"
                 android:src="@drawable/ic_pause_black_24dp" />
 

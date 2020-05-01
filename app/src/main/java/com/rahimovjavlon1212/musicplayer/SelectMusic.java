@@ -2,11 +2,10 @@ package com.rahimovjavlon1212.musicplayer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,26 +16,20 @@ import com.rahimovjavlon1212.musicplayer.models.PlaylistData;
 import com.rahimovjavlon1212.musicplayer.player.MyPlayer;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SelectMusic extends AppCompatActivity {
 
-    private SelectableAdapter mAdapter;
     private String selectedMusics = "";
-    private TextView selectedTrackCount;
-    private Button done;
     private int selectedCount = 0;
     public static String SELECTED_TRACKS = "selected_tracks";
     public static String PLAYLIST_NAME = "playlist_name";
-    private boolean hasAllChecked;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_music);
-
-        selectedTrackCount = findViewById(R.id.selectedTrackCount);
-        done = findViewById(R.id.doneButtonSelectMusicActivity);
 
         List<MusicData> data = MyPlayer.getPlayer().getPlaylist();
         PlaylistData playlist =
@@ -53,79 +46,45 @@ public class SelectMusic extends AppCompatActivity {
         selectedMusics = playlist.getData();
         selectedCount = selectedMusics.split("#").length - 1;
         if (selectedCount != 0) {
-            selectedTrackCount.setText(selectedCount + getResources().getString(R.string.selected));
-            done.setTextColor(getResources().getColor(android.R.color.black));
+            Objects.requireNonNull(getSupportActionBar()).setTitle(selectedCount + getResources().getString(R.string.selected));
         }
-        hasAllChecked = data.size() == selectedCount;
-        if (hasAllChecked) {
-            ((ImageView) findViewById(R.id.selectAllImageSelectActivity)).setImageResource(R.drawable.ic_check_circle_black_24dp);
-            done.setTextColor(getResources().getColor(android.R.color.black));
-        }
-        mAdapter = new SelectableAdapter(this, data);
+        SelectableAdapter mAdapter = new SelectableAdapter(this, data);
         RecyclerView recyclerView = findViewById(R.id.recyclerViewSelectActivity);
         recyclerView.setAdapter(mAdapter);
 
         mAdapter.onItemClicked = (musicData, position) -> {
             if (musicData.isSelected()) {
                 selectedCount++;
-                selectedTrackCount.setText(selectedCount + getResources().getString(R.string.selected));
-                done.setTextColor(getResources().getColor(android.R.color.black));
+                Objects.requireNonNull(getSupportActionBar()).setTitle(selectedCount + getResources().getString(R.string.selected));
                 selectedMusics += "#" + musicData.getMusicId();
             } else {
                 selectedCount--;
                 if (selectedCount == 0) {
-                    selectedTrackCount.setText(getResources().getString(R.string.select_tracks));
-                    done.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(getResources().getString(R.string.select_tracks));
                 } else {
-                    selectedTrackCount.setText(selectedCount + getResources().getString(R.string.selected));
+                    Objects.requireNonNull(getSupportActionBar()).setTitle(selectedCount + getResources().getString(R.string.selected));
                 }
                 selectedMusics = selectedMusics.replace("#" + musicData.getMusicId(), "");
             }
-            hasAllChecked = data.size() == selectedCount;
-            if (hasAllChecked) {
-                ((ImageView) findViewById(R.id.selectAllImageSelectActivity)).setImageResource(R.drawable.ic_check_circle_black_24dp);
-            }
         };
-
-        done.setOnClickListener(v -> {
-            if (selectedCount != 0) {
-                Intent intent = new Intent();
-                intent.putExtra(SELECTED_TRACKS, selectedMusics);
-                setResult(SelectMusic.RESULT_OK, intent);
-                finish();
-            }
-        });
-
     }
 
-    public void onSelectAllPressed(View view) {
-        List<MusicData> data = MyPlayer.getPlayer().getPlaylist();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.done_menu, menu);
+        return true;
+    }
 
-        if (hasAllChecked) {
-            selectedMusics = "";
-            for (int i = 0; i < data.size(); i++) {
-                data.get(i).setSelected(false);
-            }
-            selectedCount = 0;
-            hasAllChecked = false;
-        } else {
-            selectedMusics = "";
-            for (int i = 0; i < data.size(); i++) {
-                data.get(i).setSelected(true);
-                selectedMusics += ("#" + data.get(i).getMusicId());
-            }
-            hasAllChecked = true;
-            selectedCount = data.size();
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.done_menu) {
+            Intent intent = new Intent();
+            intent.putExtra(SELECTED_TRACKS, selectedMusics);
+            setResult(SelectMusic.RESULT_OK, intent);
+            finish();
+            return true;
         }
-        selectedTrackCount.setText(selectedCount + getResources().getString(R.string.selected));
-        mAdapter.setData(data);
-        hasAllChecked = data.size() == selectedCount;
-        if (hasAllChecked) {
-            ((ImageView) findViewById(R.id.selectAllImageSelectActivity)).setImageResource(R.drawable.ic_check_circle_black_24dp);
-            done.setTextColor(getResources().getColor(android.R.color.black));
-        } else {
-            ((ImageView) findViewById(R.id.selectAllImageSelectActivity)).setImageResource(R.drawable.ic_panorama_fish_eye_black_24dp);
-            done.setTextColor(getResources().getColor(android.R.color.darker_gray));
-        }
+        return super.onOptionsItemSelected(item);
     }
 }

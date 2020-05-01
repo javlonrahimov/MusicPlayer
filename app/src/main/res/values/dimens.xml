@@ -26,4 +26,6 @@
     <dimen name="circleRadius58">58dp</dimen>
     <dimen name="textSize16">16sp</dimen>
     <dimen name="circleRadius52">52dp</dimen>
+    <dimen name="padding20">20dp</dimen>
+    <dimen name="padding16">16dp</dimen>
 </resources>

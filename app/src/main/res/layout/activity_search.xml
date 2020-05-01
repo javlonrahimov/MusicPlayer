@@ -6,36 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".SearchActivity">
 
-
-    <LinearLayout
-        android:id="@+id/toolbarSearchActivity"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
+    <SearchView
         android:layout_margin="@dimen/margin8"
+        android:id="@+id/searchViewSearchActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/search_background"
-        android:weightSum="10"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/backButtonSearchActivity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="9"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/back_button"
-            android:padding="@dimen/padding4"
-            android:src="@drawable/ic_chevron_left_black_24dp" />
-
-        <SearchView
-            android:id="@+id/searchViewSearchActivity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="@dimen/padding4"
-            android:searchIcon="@drawable/invisible"
-            app:layout_constraintTop_toTopOf="parent" />
-    </LinearLayout>
+        android:padding="@dimen/padding4"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSearchActivity"
@@ -45,6 +23,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarSearchActivity"
+        app:layout_constraintTop_toBottomOf="@id/searchViewSearchActivity"
         tools:listitem="@layout/item_music" />
 </androidx.constraintlayout.widget.ConstraintLayout>

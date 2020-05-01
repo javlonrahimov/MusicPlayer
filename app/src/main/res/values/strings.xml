@@ -50,4 +50,9 @@
     <string name="NowPlayingLabel">Now playing</string>
     <string name="LibraryLabel">Library</string>
     <string name="splash">Splash screen</string>
+    <string name="search">Search</string>
+    <string name="info">Info</string>
+    <string name="currently_you_don_t_have_musics_in_your_phone">Currently you don\'t have musics in your phone</string>
+    <string name="currently_you_don_t_have_favourite_musics">Currently you don\'t have favourite musics</string>
+    <string name="cover_image">cover image</string>
 </resources>

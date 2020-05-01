@@ -32,6 +32,11 @@ public class AllFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all, container, false);
         mAdapter = new LibraryAdapter(getActivity(), mList);
+        if (mList.size() == 0){
+            view.findViewById(R.id.hintAllFragment).setVisibility(View.VISIBLE);
+        }else {
+            view.findViewById(R.id.hintAllFragment).setVisibility(View.INVISIBLE);
+        }
         mAdapter.setFocus(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId());
         mAdapter.onItemClicked = musicData -> MyPlayer.getPlayer().start(musicData, new PlaylistData(-1, "", ""));
         MyPlayer.getPlayer().onChangeListenerAllFragment = () -> mAdapter.setFocus(PlayerCache.getPlayerCache().getCurrentMusic().getMusicId());
